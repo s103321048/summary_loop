@@ -125,7 +125,7 @@ for epi in range(n_epochs):
         T1 = time.time()
         log_obj = {}
 
-        bodies = [" ".join(doc.split(" ")[:300]) for doc in documents]
+        bodies = [" ".join(doc.split(" ")[:300]) for doc in documents if len(doc) > 0 ]
 
         # We run tokenization in the background, as it is BERT tokenization only used after the summarizer has run. Saves about 5% of time.
         thread1 = threading.Thread(target = background_tokenizer, args = (bodies, my_queue))
