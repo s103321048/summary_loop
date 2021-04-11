@@ -133,7 +133,7 @@ class GeneTransformer:
         else:
             return outputs, end_indices
 
-    def decode_beam_batch(self, bodies, beam_size=3, max_output_length=100, sample=False):
+    def decode_beam_batch(self, bodies, beam_size=3, max_output_length=100, sample=False, show_each_beam=False):
         if self.mode != 'eval':
             print("BEWARE. Model is not in eval mode.")
         self.eval() ## << Surely you are not training with beam decode?
@@ -198,6 +198,17 @@ class GeneTransformer:
 
             # [BOOKKEEPING] Going from k² to k options at each time means we have to swap all the caches around: past, build-up
             if build_up is not None:
+                #######
+                if show_each_beam is True:
+                    print(build_up)
+                    building_output = []
+                    for beams in build_up:
+                        out_ = [self.tokenizer.decode(beam.tolist())+"END" for beam in beams]
+                        out_ = [S[:S.index("END")] for S in out_]
+                        building_output.append(out_)
+                    for output, score in zip(building_output, selected_scores):
+                        print("".join(output), "|%.2f"%float(score))
+
                 build_up = build_up[tracks, :]
             past = [p[:, tracks, :] for p in past]
             
@@ -220,7 +231,7 @@ class GeneTransformer:
 
         return outputs, batched_scores.tolist()
 
-    def decode(self, bodies, max_output_length=100, max_batch_size=8, beam_size=1, return_scores=False, sample=False, progress=False):
+    def decode(self, bodies, max_output_length=100, max_batch_size=8, beam_size=1, return_scores=False, sample=False, progress=False, show_each_beam=False):
         N = len(bodies)
         outputs = []
         scores = []
@@ -231,7 +242,7 @@ class GeneTransformer:
             batch_bodies = bodies[i:min(N,i+max_batch_size)]
             with torch.no_grad():
                 if beam_size > 1:
-                    batch_outputs = self.decode_beam_batch(batch_bodies, beam_size=beam_size, max_output_length=max_output_length, sample=sample)
+                    batch_outputs = self.decode_beam_batch(batch_bodies, beam_size=beam_size, max_output_length=max_output_length, sample=sample, show_each_beam=show_each_beam)
                 else:
                     batch_outputs = self.decode_batch(batch_bodies, max_output_length=max_output_length, sample=sample, return_scores=return_scores)
             if return_scores:
