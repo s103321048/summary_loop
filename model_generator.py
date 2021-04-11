@@ -187,6 +187,7 @@ class GeneTransformer:
         
             batched_tracks = batched_choices / beam_size
             tracks = beam_size*torch.repeat_interleave(torch.arange(batch_size), repeats=beam_size).to(self.device) + batched_tracks.view(-1)
+            tracks = list(tracks)
 
             selected_scores = batched_scores[torch.repeat_interleave(torch.arange(batch_size), repeats=beam_size), batched_choices.view(-1)]
 
