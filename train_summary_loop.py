@@ -34,10 +34,12 @@ if args.device == "cuda":
     os.environ["CUDA_VISIBLE_DEVICES"] = ""+str(freer_gpu)
     args.experiment += "_"+freer_gpu
 
-models_folder = "/home/ubuntu/models/"
-log_folder = "/home/ubuntu/logs/"
+models_folder = args.root_folder + "models/"
+log_folder = args.root_folder + "logs/"
 
 summarizer_model_start = os.path.join(models_folder, "gpt2_copier23.bin")
+#summarizer_model_start = os.path.join(models_folder, "gpt2_train_summerizer_cnn28k_0.bin")
+#summarizer_model_start = os.path.join(models_folder, "gpt2_train_summerizer_cnndm28k_26_0.bin") 
 
 ckpt_every = args.ckpt_every
 ckpt_lookback = int((args.ckpt_lookback+args.train_batch_size-1)/args.train_batch_size)
