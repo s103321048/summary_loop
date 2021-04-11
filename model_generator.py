@@ -23,7 +23,6 @@ class GeneTransformer:
             exit()
 
         self.model = GPT2LMHeadModel(config)
-
         self.model.to(device)
         self.device = device
         if starter_model is not None:
