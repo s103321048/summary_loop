@@ -22,8 +22,8 @@ parser.add_argument('--starter_model', default="", help="which model to start wi
 
 args = parser.parse_args()
 
-models_folder = "/home/ubuntu/models/"
-logs_folder =   "/home/ubuntu/logs/"
+models_folder = "/home/robin/TrySomethingNew/summary_loop/models/"
+logs_folder =   "/home/robin/TrySomethingNew/summary_loop/logs/"
 
 if args.device == "cuda":
     freer_gpu = str(utils_misc.get_freer_gpu())
