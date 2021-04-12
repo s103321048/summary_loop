@@ -21,6 +21,7 @@ class SQLDataset(torch.utils.data.dataset.Dataset):
         self.curr = self.conn.cursor()
 
     def __getitem__(self, index):
+        index = index + 1 # make the index start from 1 (in .db the first item start with     1 not 0)
         if self.cut is not None:
             res = self.curr.execute("SELECT * FROM "+self.table_name+" WHERE cut_id=? and cut=?", (index, self.cut))
         else:
