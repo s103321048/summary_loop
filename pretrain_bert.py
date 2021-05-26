@@ -29,7 +29,7 @@ print("Model loaded")
 
 vocab_size = tokenizer.vocab_size
 
-summ = LogPlot("/home/robin/TrySomethingNew/summary_loop_by_me/bert_news.log")
+summ = LogPlot("/home/robin/TrySomethingNew/summary_loop_by_me/logs/bert_news.log")
 
 def random_word(tokens, tokenizer):
     output_label = []
@@ -164,8 +164,8 @@ for _ in range(n_epochs):
         mlm_acc = (lm_label_ids.view(-1).eq(torch.argmax(mlm_logits,dim=2).view(-1)).float().sum()/num_predicts).item()
 
         if ib%args.optim_every == 0:
-            scheduler.step()  # Update learning rate schedule
             optimizer.step()
+            scheduler.step()  # Update learning rate schedule
             optimizer.zero_grad()
             torch.cuda.empty_cache()
 
@@ -173,4 +173,4 @@ for _ in range(n_epochs):
         if time.time()-time_save > 60.0:
             summ.save(printing=True)
             time_save = time.time()
-            torch.save(model.state_dict(), "/home/robin/TrySomethingNew/summary_loop_by_me/models/test_news_bert_bs"+str(args.optim_every*args.train_batch_size)+".bin")
+            torch.save(model.state_dict(), "/home/robin/TrySomethingNew/summary_loop_by_me/models/cnndm_train_news_bert_bs"+str(args.optim_every*args.train_batch_size)+".bin")
