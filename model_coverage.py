@@ -91,6 +91,7 @@ class KeywordCoverage():
         self.device = device
         self.model.to(self.device)
         if model_file is not None:
+            print("Model:", "[{}]".format(model_file.split('/')[-1]), "is loaded.")
             self.reload_model(model_file)
 
     def mask_text(self, text_tokenized, content):
