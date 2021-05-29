@@ -35,8 +35,8 @@ dataset = SQLDataset(args.dataset_file)
 dataloader = DataLoader(dataset=dataset, batch_size=args.train_batch_size, sampler=RandomSampler(dataset), drop_last=True, collate_fn=collate_func)
 
 # kw_cov = KeywordCoverage(args.device, keyword_model_file=os.path.join(models_folder, "keyword_extractor.joblib"), n_kws=args.n_kws) # , model_file=os.path.join(models_folder, "news_bert_bs64.bin")
-kw_cov = KeywordCoverage(args.device, n_kws=args.n_kws) # , model_file=os.path.join(models_folder, "news_bert_bs64.bin")
-# kw_cov = KeywordCoverage(args.device, n_kws=args.n_kws , model_file=os.path.join(models_folder, "test_news_bert_bs64.bin") )
+#kw_cov = KeywordCoverage(args.device, n_kws=args.n_kws) # , model_file=os.path.join(models_folder, "news_bert_bs64.bin")
+kw_cov = KeywordCoverage(args.device, n_kws=args.n_kws , model_file=os.path.join(models_folder, "news_bert_train.bin") )
 kw_cov.model.train()
 print("Loaded model")
 
