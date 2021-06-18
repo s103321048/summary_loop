@@ -39,10 +39,10 @@ if args.device == "cuda":
 models_folder = args.root_folder + "models/"
 log_folder = args.root_folder + "logs/"
 
-#summarizer_model_start = os.path.join(models_folder, "gpt2_copier23.bin")
+#summarizer_model_start = os.path.join(models_folder, "origin_models/gpt2_copier23.bin")
 #summarizer_model_start = os.path.join(models_folder, "gpt2_test_cgen23.bin")
-#summarizer_model_start = os.path.join(models_folder, "gpt2_train_cgen23.bin")
-summarizer_model_start = os.path.join(models_folder, "origin_models/summary_loop_length24.bin")
+summarizer_model_start = os.path.join(models_folder, "summarizer_faith_batch2_1_ckpt.bin")
+#summarizer_model_start = os.path.join(models_folder, "origin_models/summary_loop_length24.bin")
 
 ckpt_every = args.ckpt_every
 ckpt_lookback = int((args.ckpt_lookback+args.train_batch_size-1)/args.train_batch_size)
@@ -51,7 +51,6 @@ best_ckpt_score = None
 
 ckpt_file = os.path.join(models_folder, "summarizer_"+args.experiment+"_ckpt.bin")
 ckpt_optimizer_file = os.path.join(models_folder, "summarizer_optimizer_"+args.experiment+"_ckpt.bin")
-
 learning_rate = 2e-5
 n_epochs = args.n_epochs
 
@@ -123,6 +122,20 @@ dataset = all_dataset
 print("Dataset size:", len(dataset))
 dataloader = DataLoader(dataset=dataset, batch_size=args.train_batch_size, sampler=RandomSampler(dataset), drop_last=True, collate_fn=collate_func)
 
+def low_summary_quality(log_obj, total_sampled_scores):
+    current_total_score = torch.mean(total_sampled_scores).item()
+
+    if len(log_obj) == 0 or current_total_score < 4:
+        return True
+    else:
+        return ( log_obj["reppen_score"] > 0 or
+                 log_obj["patpen_score"] > 0 or
+                 log_obj["lengthpen_score"] == 1 or
+                 log_obj['fluency_score']  < 0.3 or
+                 log_obj['coverage_score'] < 0.3
+                )
+
+
 for epi in range(n_epochs):
     print("=================== EPOCH",epi, "===================")
     for ib, documents in enumerate(dataloader):
@@ -162,8 +175,8 @@ for epi in range(n_epochs):
         total_sampled_scores = torch.FloatTensor([0.0] * batch_size).to(args.device)
         total_argmax_scores = torch.FloatTensor([0.0] * batch_size).to(args.device)
         for scorer in scorers:
-            if torch.mean(total_sampled_scores).item() < 2 and scorer['name'] == "faith":
-                continue # if total_sample_score is low, quality of summary is too bad, not worth to cal faithfulness, usually 0
+            if scorer['name'] == "faith" and low_summary_quality(log_obj, total_sampled_scores):
+                continue # when summary quality is low, not worth to cal faithfulness, usually 0
 
             T = time.time()
 
